@@ -1,0 +1,6 @@
+export { default as Navbar } from './website/src/components/Navbar'
+export { default as Hero } from './website/src/components/Hero'
+export { default as Features } from './website/src/components/Features'
+export { default as About } from './website/src/components/About'
+export { default as Contact } from './website/src/components/Contact'
+export { default as Footer } from './website/src/components/Footer'
