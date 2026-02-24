@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API ESP32</title>
+</head>
+<body>
+    <h2>Enviar Mensagem para ESP</h2>
+    
+    <input type="text" id="mensagem" placeholder="Digite a mensagem">
+    <button onclick="enviarMensagem()">Enviar</button>
+
+    <h3>Mensagens recebidas do ESP:</h3>
+    <button onclick="buscarMensagens()">Atualizar</button>
+    <ul id="lista"></ul>
+
+    <script>
+        function enviarMensagem() {
+            let msg = document.getElementById("mensagem").value;
+
+            fetch("/enviar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({mensagem: msg})
+            })
+            .then(response => response.json())
+            .then(data => alert(data.status || data.erro));
+        }
+
+        function buscarMensagens() {
+            fetch("/mensagens_esp")
+            .then(response => response.json())
+            .then(data => {
+                let lista = document.getElementById("lista");
+                lista.innerHTML = "";
+
+                data.mensagens.forEach(m => {
+                    let li = document.createElement("li");
+                    li.innerText = m;
+                    lista.appendChild(li);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

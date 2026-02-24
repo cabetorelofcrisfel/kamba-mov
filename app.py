@@ -1,98 +1,67 @@
-from flask import Flask, request, render_template, send_from_directory, jsonify
-from flask_socketio import SocketIO
+from flask import Flask, request, jsonify, render_template
 import os
-from datetime import datetime
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # limite 20MB
 
-# Configuração compatível com Railway/Render
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+# Armazena mensagens em memória
+mensagens_para_esp = []
+mensagens_recebidas_esp = []
 
-# Criar pasta uploads se não existir
-if not os.path.exists("uploads"):
-    os.makedirs("uploads")
-
-dados = []
-mensagens_esp = []
-
-# ================= DASHBOARD =================
+# =========================
+# Página principal (HTML)
+# =========================
 @app.route("/")
-def index():
-    return jsonify({
-        "status": "API online",
-        "registros": len(dados)
-    })
+def home():
+    return render_template("index.html")
 
-# ================= PING =================
-@app.route("/ping")
-def ping():
-    return "pong", 200
+# =========================
+# API envia mensagem para ESP
+# =========================
+@app.route("/enviar", methods=["POST"])
+def enviar():
+    data = request.json
+    mensagem = data.get("mensagem")
 
-# ================= RECEBER DO ESP =================
-@app.route("/upload", methods=["POST"])
-def upload():
-    texto = request.form.get("texto")
-    arquivo = request.files.get("arquivo")
+    if mensagem:
+        mensagens_para_esp.append(mensagem)
+        return jsonify({"status": "Mensagem enviada para ESP"})
+    
+    return jsonify({"erro": "Mensagem vazia"}), 400
 
-    print("=== Novo envio recebido ===")
-    print("Texto:", texto)
-    print("Arquivo:", arquivo.filename if arquivo else None)
+# =========================
+# ESP busca mensagens
+# =========================
+@app.route("/buscar", methods=["GET"])
+def buscar():
+    if mensagens_para_esp:
+        mensagem = mensagens_para_esp.pop(0)
+        return jsonify({"mensagem": mensagem})
+    
+    return jsonify({"mensagem": None})
 
-    nome_arquivo = None
+# =========================
+# ESP envia mensagem para API
+# =========================
+@app.route("/receber", methods=["POST"])
+def receber():
+    data = request.json
+    mensagem = data.get("mensagem")
 
-    if arquivo:
-        nome_arquivo = datetime.now().strftime("%Y%m%d%H%M%S_") + arquivo.filename
-        caminho = os.path.join(app.config["UPLOAD_FOLDER"], nome_arquivo)
-        arquivo.save(caminho)
-        print("Arquivo salvo em:", caminho)
+    if mensagem:
+        mensagens_recebidas_esp.append(mensagem)
+        return jsonify({"status": "Mensagem recebida com sucesso"})
+    
+    return jsonify({"erro": "Mensagem vazia"}), 400
 
-    registro = {
-        "texto": texto,
-        "arquivo": nome_arquivo,
-        "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    }
+# =========================
+# Ver mensagens recebidas do ESP
+# =========================
+@app.route("/mensagens_esp", methods=["GET"])
+def mensagens_esp():
+    return jsonify({"mensagens": mensagens_recebidas_esp})
 
-    dados.insert(0, registro)
-
-    # Notifica dashboard em tempo real
-    socketio.emit("novo", registro)
-
-    return jsonify({"status": "recebido"})
-
-# ================= ENVIAR MENSAGEM PARA ESP =================
-@app.route("/send_message", methods=["POST"])
-def send_message():
-    msg = request.form.get("texto")
-
-    if msg:
-        mensagens_esp.append(msg)
-        print("Mensagem enviada para ESP:", msg)
-        return jsonify({"status": "ok"})
-    else:
-        return jsonify({"status": "erro", "motivo": "texto vazio"}), 400
-
-# ================= ESP BUSCA MENSAGENS =================
-@app.route("/get_messages")
-def get_messages():
-    global mensagens_esp
-    msgs = mensagens_esp.copy()
-    mensagens_esp = []  # limpa após envio
-
-    if msgs:
-        print("ESP buscou mensagens:", msgs)
-
-    return jsonify(msgs)
-
-# ================= SERVIR ARQUIVOS =================
-@app.route("/uploads/<path:nome>")
-def arquivo(nome):
-    return send_from_directory("uploads", nome)
-
-# ================= INICIAR SERVIDOR =================
+# =========================
+# Execução
+# =========================
 if __name__ == "__main__":
-    print("=== API Iniciada ===")
-
-    port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
