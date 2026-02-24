@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>API Dashboard - ESP32</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<style>
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+header {
+    background: #1e293b;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+.container {
+    padding: 20px;
+}
+.card {
+    background: #1e293b;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.2);
+}
+.card input, .card textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: none;
+}
+.card button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #00ffff;
+    cursor: pointer;
+}
+.card button:hover {
+    background: #00cccc;
+}
+.card img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+#mensagens {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<header>📡 Dashboard da API - Monitoramento ESP32</header>
+
+<div class="container">
+
+<div class="card">
+<h2>Enviar Mensagem para o ESP</h2>
+<input type="text" id="msg_esp" placeholder="Digite a mensagem">
+<button onclick="enviarParaESP()">Enviar</button>
+</div>
+
+<div class="card">
+<h2>Mensagens Recebidas do ESP</h2>
+<div id="mensagens">
+{% for item in dados %}
+<div class="card">
+    <p><b>Texto:</b> {{ item.texto }}</p>
+    {% if item.arquivo %}
+        <img src="/uploads/{{ item.arquivo }}">
+    {% endif %}
+</div>
+{% endfor %}
+</div>
+</div>
+
+</div>
+
+<script>
+var socket = io();
+
+// Atualização em tempo real quando o ESP envia novas mensagens
+socket.on("novo", function(data){
+    var div = document.getElementById("mensagens");
+    var card = document.createElement("div");
+    card.className = "card";
+    var html = "<p><b>Texto:</b> " + data.texto + "</p>";
+    if(data.arquivo){
+        html += '<img src="/uploads/' + data.arquivo + '">';
+    }
+    card.innerHTML = html;
+    div.prepend(card);
+});
+
+// Função para enviar mensagem para o ESP
+function enviarParaESP(){
+    var msg = document.getElementById("msg_esp").value;
+    if(msg == "") return alert("Digite uma mensagem!");
+
+    fetch("/send_message", {
+        method: "POST",
+        body: new URLSearchParams({texto: msg})
+    })
+    .then(r => r.json())
+    .then(d => {
+        if(d.status == "ok"){
+            alert("Mensagem enviada para o ESP!");
+            document.getElementById("msg_esp").value = "";
+        } else {
+            alert("Erro: " + d.motivo);
+        }
+    });
+}
+</script>
+
+</body>
+</html>
