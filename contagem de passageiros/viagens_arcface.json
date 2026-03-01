@@ -1,0 +1,98 @@
+{
+    "v1_020813": {
+        "id": 1,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T02:05:15.911006",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2388,
+        "saida_ts": "2026-02-28T02:08:13.044808",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2388,
+        "distancia_km": 0.0,
+        "valor": 150
+    },
+    "v5_020813": {
+        "id": 5,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T02:08:05.334002",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2388,
+        "saida_ts": "2026-02-28T02:08:13.048811",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2388,
+        "distancia_km": 0.0,
+        "valor": 150
+    },
+    "v2_152349": {
+        "id": 2,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T15:22:41.428328",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2344,
+        "saida_ts": "2026-02-28T15:23:49.197613",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2344,
+        "distancia_km": 0.0,
+        "valor": 300
+    },
+    "v3_152413": {
+        "id": 3,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T15:22:45.919003",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2344,
+        "saida_ts": "2026-02-28T15:24:13.393141",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2344,
+        "distancia_km": 0.0,
+        "valor": 300
+    },
+    "v1_154047": {
+        "id": 1,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T15:39:03.877041",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2344,
+        "saida_ts": "2026-02-28T15:40:47.423642",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2344,
+        "distancia_km": 0.0,
+        "valor": 300
+    },
+    "v2_154918": {
+        "id": 2,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T15:45:34.771318",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2344,
+        "saida_ts": "2026-02-28T15:49:18.004426",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2344,
+        "distancia_km": 0.0,
+        "valor": 300
+    },
+    "v2_165847": {
+        "id": 2,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T16:56:12.902981",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2344,
+        "saida_ts": "2026-02-28T16:58:47.260286",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2344,
+        "distancia_km": 0.0,
+        "valor": 300
+    },
+    "v2_184027": {
+        "id": 2,
+        "estado": "concluido",
+        "entrada_ts": "2026-02-28T18:35:14.881262",
+        "entrada_lat": -8.8383,
+        "entrada_lon": 13.2344,
+        "saida_ts": "2026-02-28T18:40:27.820194",
+        "saida_lat": -8.8383,
+        "saida_lon": 13.2344,
+        "distancia_km": 0.0,
+        "valor": 300
+    }
+}

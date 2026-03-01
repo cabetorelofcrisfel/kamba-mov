@@ -1,47 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>API ESP32</title>
+    <meta charset="UTF-8">
+    <title>Painel ESP32-CAM</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 250px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .images {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .images img {
+            width: 200px;
+            margin: 10px;
+            border-radius: 10px;
+            border: 2px solid #2563eb;
+        }
+
+        .mensagens {
+            margin-top: 20px;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Enviar Mensagem para ESP</h2>
-    
+
+<h1>Painel ESP32-CAM</h1>
+
+<div class="container">
+    <h3>Enviar mensagem para ESP</h3>
     <input type="text" id="mensagem" placeholder="Digite a mensagem">
-    <button onclick="enviarMensagem()">Enviar</button>
+    <button class="btn-primary" onclick="enviarMensagem()">Enviar</button>
+</div>
 
-    <h3>Mensagens recebidas do ESP:</h3>
-    <button onclick="buscarMensagens()">Atualizar</button>
-    <ul id="lista"></ul>
+<div class="mensagens">
+    <h3>Mensagens recebidas do ESP</h3>
+    <ul id="listaMensagens"></ul>
+</div>
 
-    <script>
-        function enviarMensagem() {
-            let msg = document.getElementById("mensagem").value;
+<div class="container">
+    <h3>Stream de Imagens</h3>
+    <div class="images" id="galeria"></div>
+</div>
 
-            fetch("/enviar", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({mensagem: msg})
-            })
-            .then(response => response.json())
-            .then(data => alert(data.status || data.erro));
-        }
+<script>
 
-        function buscarMensagens() {
-            fetch("/mensagens_esp")
-            .then(response => response.json())
-            .then(data => {
-                let lista = document.getElementById("lista");
-                lista.innerHTML = "";
+function enviarMensagem() {
+    const msg = document.getElementById("mensagem").value;
 
-                data.mensagens.forEach(m => {
-                    let li = document.createElement("li");
-                    li.innerText = m;
-                    lista.appendChild(li);
-                });
+    fetch("/enviar", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ mensagem: msg })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.status || data.erro);
+    });
+}
+
+// =============================
+// Atualiza mensagens do ESP
+// =============================
+function atualizarMensagens() {
+    fetch("/mensagens_esp")
+        .then(response => response.json())
+        .then(data => {
+            const lista = document.getElementById("listaMensagens");
+            lista.innerHTML = "";
+
+            data.mensagens.forEach(msg => {
+                const li = document.createElement("li");
+                li.textContent = msg;
+                lista.appendChild(li);
             });
-        }
-    </script>
+        });
+}
+
+// =============================
+// Atualiza galeria de imagens
+// =============================
+function atualizarImagens() {
+    fetch("/imagens")
+        .then(response => response.json())
+        .then(data => {
+            const galeria = document.getElementById("galeria");
+            galeria.innerHTML = "";
+
+            data.imagens.slice(0, 10).forEach(img => {
+                const imagem = document.createElement("img");
+                imagem.src = "/imagem/" + img + "?t=" + new Date().getTime();
+                galeria.appendChild(imagem);
+            });
+        });
+}
+
+// Atualiza automaticamente a cada 2 segundos
+setInterval(() => {
+    atualizarMensagens();
+    atualizarImagens();
+}, 2000);
+
+// Carrega ao abrir página
+atualizarMensagens();
+atualizarImagens();
+
+</script>
+
 </body>
 </html>
